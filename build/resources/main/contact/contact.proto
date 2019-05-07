@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package blog;
+
+option java_package = "com.proto.contact";
+option java_multiple_files = true;
+
+import "google/protobuf/timestamp.proto";
+
+
+message Contact {
+    string id = 1;
+    string agent_guid = 2;
+    string first_name = 3;
+    string last_name = 4;
+    string comments = 5;
+    repeated Tag tags = 6;
+    repeated Email emails = 7;
+    repeated Phone phones = 8;
+    repeated Address addresses = 9;
+    google.protobuf.Timestamp creation_date = 10;
+}
+
+message CreateContactRequest {
+    Contact contact = 1;
+}
+
+message CreateContactResponse {
+    Contact contact = 1;
+}
+
+message GetContactRequest {
+    string id = 1;
+}
+
+message GetContactResponse {
+    Contact contact = 1;
+}
+
+service ContactService {
+    rpc CreateContact(CreateContactRequest) returns (CreateContactResponse) {};
+
+    rpc CreateStreamContact(stream CreateContactRequest) returns (stream CreateContactResponse) {};
+
+    //rpc UpdateContact(UpdateContactRequest) returns (UpdateContactResponse) {};
+
+    rpc GetContact(GetContactRequest) returns (GetContactResponse) {};
+}
+
+
+
+message Email {
+    string email_id = 1;
+    string type = 2;
+}
+
+message Phone {
+    string phone_number = 1;
+    string type = 2;
+}
+
+message Address {
+    string address_line_1 = 1;
+    string address_line_2 = 2;
+    string city = 3;
+    string state = 4;
+    string zip_code = 5;
+    string type = 6;
+}
+
+message Tag {
+    string tag_name = 1;
+}
