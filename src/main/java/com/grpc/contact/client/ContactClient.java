@@ -32,16 +32,17 @@ public class ContactClient {
         .usePlaintext()
         .build();
 
-    doCall(channel);
+
+    doUnaryCall(channel);
     //doBiDiStreamingCall(channel);
-
-
     //doGetCall(channel);
+
+
     System.out.println("Shutting down channel");
     channel.shutdown();
   }
 
-  private void doCall(ManagedChannel channel) {
+  private void doUnaryCall(ManagedChannel channel) {
 
     ContactServiceGrpc.ContactServiceBlockingStub contactClient = ContactServiceGrpc.newBlockingStub(channel);
 
@@ -59,7 +60,6 @@ public class ContactClient {
 
     GetContactResponse getResponse = contactClient.getContact(GetContactRequest.newBuilder()
         .setId(createResponse.getContact().getId()).build());
-
     System.out.println(getResponse.toString());
 
 

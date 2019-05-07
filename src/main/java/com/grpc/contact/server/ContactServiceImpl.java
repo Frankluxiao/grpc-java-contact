@@ -30,8 +30,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 public class ContactServiceImpl extends ContactServiceGrpc.ContactServiceImplBase{
 
   private MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
-  private MongoDatabase database = mongoClient.getDatabase("agent_contacts");
-
+  private MongoDatabase database = mongoClient.getDatabase("contact");
   private CodecRegistry pojoCodecRegistry = fromRegistries(getDefaultCodecRegistry(),
       fromProviders(PojoCodecProvider.builder().automatic(true).build()));
   private MongoCollection<ContactPOJO> mongoCollection = database
@@ -44,13 +43,11 @@ public class ContactServiceImpl extends ContactServiceGrpc.ContactServiceImplBas
     Contact contact = request.getContact();
     Instant creationDate = Instant.now();
 
-    ContactPOJO contactPOJO = mapToPOJO(contact, creationDate);
-
-    //ContactPOJO contactPOJOTest = ContactMapper.INSTANCE.sourceToTarget(contact);
+    ContactPOJO contactPOJO = convertToContactPOJO(contact, creationDate);
 
     mongoCollection.insertOne(contactPOJO);
 
-    String id = contactPOJO.getId().toString();
+    String id = contactPOJO.getId();
 
     CreateContactResponse createContactResponse = CreateContactResponse.newBuilder()
         .setContact(contact.toBuilder()
@@ -78,16 +75,11 @@ public class ContactServiceImpl extends ContactServiceGrpc.ContactServiceImplBas
         Contact contact = value.getContact();
         Instant creationDate = Instant.now();
 
-        ContactPOJO contactPOJO = mapToPOJO(contact, creationDate);
-
-        //ContactMapper contactMapper = ContactMapper.INSTANCE;
-
-
-        //ContactPOJO contactPOJOTest = ContactMapper.INSTANCE.sourceToTarget(contact);
+        ContactPOJO contactPOJO = convertToContactPOJO(contact, creationDate);
 
         mongoCollection.insertOne(contactPOJO);
 
-        String id = contactPOJO.getId().toString();
+        String id = contactPOJO.getId();
 
         CreateContactResponse createContactResponse = CreateContactResponse.newBuilder()
             .setContact(contact.toBuilder()
@@ -127,9 +119,7 @@ public class ContactServiceImpl extends ContactServiceGrpc.ContactServiceImplBas
       throw new RuntimeException("Failed to find ID = " + id + " in database. Is it invalid?");
     }
 
-    Contact contact = mapper(contactPOJO);
-
-    //Contact contactTest = ContactMapper.INSTANCE.targetToSource(contactPOJO);
+    Contact contact = convertToContact(contactPOJO);
 
     GetContactResponse getContactResponse = GetContactResponse.newBuilder()
         .setContact(contact)
@@ -141,11 +131,11 @@ public class ContactServiceImpl extends ContactServiceGrpc.ContactServiceImplBas
 
 
 
-  private Contact mapper(ContactPOJO contactPOJO) {
+  private Contact convertToContact(ContactPOJO contactPOJO) {
 
     return Contact.newBuilder()
         .setId(contactPOJO.getId())
-        .setAgentGuid(contactPOJO.getAgentGuid())
+        .setAgentGuid(contactPOJO.getAgentId())
         .setFirstName(contactPOJO.getFirstName())
         .setLastName(contactPOJO.getLastName())
         .addAllEmails(contactPOJO.getEmails())
@@ -162,11 +152,11 @@ public class ContactServiceImpl extends ContactServiceGrpc.ContactServiceImplBas
 
 
 
-  private ContactPOJO mapToPOJO(Contact contact, Instant creationDate) {
+  private ContactPOJO convertToContactPOJO(Contact contact, Instant creationDate) {
 
     return ContactPOJO.builder()
         .id(UUID.randomUUID().toString())
-        .agentGuid(contact.getAgentGuid())
+        .agentId(contact.getAgentGuid())
         .firstName(contact.getFirstName())
         .lastName(contact.getLastName())
         .emails(contact.getEmailsList())

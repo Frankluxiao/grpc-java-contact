@@ -19,11 +19,10 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-//public class ContactPOJO implements Serializable {
 public class ContactPOJO {
 
     private String id;
-    private String agentGuid;
+    private String agentId;
     private String firstName;
     private String lastName;
     private String comments;

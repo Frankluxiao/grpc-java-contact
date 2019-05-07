@@ -8,7 +8,7 @@ public class ContactServer {
 
   public  static void main(String[] args) throws IOException, InterruptedException {
 
-    System.out.println("Hello gRPC");
+    System.out.println("gRPC server is running.");
 
     Server server = ServerBuilder.forPort(50051)
         .addService(new ContactServiceImpl())
